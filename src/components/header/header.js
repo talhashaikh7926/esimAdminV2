@@ -20,6 +20,7 @@ export default function MainHeader({ title, mobileSidebar, toggle1 }) {
     localStorage.removeItem("userInfo");
     history.push("/");
     window.location.reload();
+    console.log('');
   };
   return (
     <>
