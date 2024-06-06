@@ -12,6 +12,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { createBrowserHistory } from "history";
 import { Layout, Menu, Button } from "antd";
+import InventoryIccid from "../pages/inventoryTracking/inventorywithICCID";
 
 const { SubMenu } = Menu;
 const { Header, Sider, Content, Footer } = Layout;
@@ -150,6 +151,11 @@ const App = () => {
                   All Inventory
                 </Link>
               </Menu.Item>
+              <Menu.Item key="inventory-iccid" style={{ transition: 'background-color 0.3s' }}>
+                <Link to="inventory-iccid" onClick={() => { changetitle("Inventory Iccid"); setToggle(false); }}>
+                  My Inventory With ICCID
+                </Link>
+              </Menu.Item>
             </SubMenu>
 
             <Menu.Item key="productType" icon={<FontAwesomeIcon icon={faGauge} />} style={{ transition: 'background-color 0.3s' }}>
@@ -173,6 +179,7 @@ const App = () => {
               <Route path="/productType" exact element={<ProductType />} />
               <Route path="/productPlan" exact element={<ProductPlan />} />
               <Route path="/inventory" exact element={<AllInventory />} />
+              <Route path="/inventory-iccid" exact element={<InventoryIccid />} />
             </Routes>
           </Content>
 

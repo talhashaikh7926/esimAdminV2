@@ -17,7 +17,6 @@ import {
 import axios from 'axios';
 
 export const addProductPlan = (data) => (dispatch) => {
-    console.log(data, "check");
     dispatch({ type: POST_PRODUCT_PLAN_REQUEST });
     const token = JSON.parse(localStorage.getItem('token'));
     return axios({

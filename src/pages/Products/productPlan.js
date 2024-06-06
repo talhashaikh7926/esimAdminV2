@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Layout, Form, Input, Checkbox, Button, Table, Typography, Space, notification, Select } from 'antd';
 import { addProductPlan, productPlanSearch, deleteProductPlan, updateProductPlan } from '../../redux/actions/productPlan.action';
 import { productTypeSearch } from '../../redux/actions/productType.action';
+import Swal from 'sweetalert2';
 import { useDispatch, useSelector } from "react-redux";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
@@ -118,18 +119,30 @@ const ProductPlan = () => {
         });
     };
 
+
     const handleDelete = (key) => {
-        dispatch(deleteProductPlan(key)).then((res) => {
-            if (res.type === "DELETE_PRODUCT_PLAN_SUCCESS") {
-                notification.success({
-                    message: "Delete Successful",
-                    className: "toast-success",
-                });
-                dispatch(productPlanSearch());
-            } else {
-                notification.error({
-                    message: res?.payload?.message,
-                    className: "toast-error",
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to delete this item?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, keep it'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                dispatch(deleteProductPlan(key)).then((res) => {
+                    if (res.type === "DELETE_PRODUCT_PLAN_SUCCESS") {
+                        notification.success({
+                            message: "Delete Successful",
+                            className: "toast-success",
+                        });
+                        dispatch(productPlanSearch());
+                    } else {
+                        notification.error({
+                            message: res?.payload?.message,
+                            className: "toast-error",
+                        });
+                    }
                 });
             }
         });

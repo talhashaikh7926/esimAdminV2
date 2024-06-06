@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Layout, Form, Input, Checkbox, Button, Table, Typography, Space, notification, Select } from 'antd';
-import { addProductPlan, productPlanSearch, deleteProductPlan, updateProductPlan } from '../../redux/actions/productPlan.action';
+import { Layout, Form, Input, Checkbox, Button, Table, Typography, Space, notification, Select, DatePicker } from 'antd';
+import { productPlanSearch } from '../../redux/actions/productPlan.action';
 import { productTypeSearch } from '../../redux/actions/productType.action';
+import Swal from 'sweetalert2';
+import moment from 'moment';
 import { useDispatch, useSelector } from "react-redux";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { InventorySearch, addInventory, updateInventory, deleteInventory } from '../../redux/actions/allInventory.action';
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -16,32 +19,71 @@ const AllInventory = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [currentProductType, setCurrentProductType] = useState(null);
     const dispatch = useDispatch();
-    const { getProductPlan, getProductType } = useSelector((state) => state);
+    const { getProductPlan, getProductType, getInventory } = useSelector((state) => state);
 
     useEffect(() => {
+        dispatch(InventorySearch());
         dispatch(productPlanSearch());
         dispatch(productTypeSearch());
     }, [dispatch]);
 
-    console.log(getProductPlan,"check");
     const columns = [
+        {
+            title: 'Order Number/ Buyer Name',
+            dataIndex: 'orderNumber',
+            key: 'orderNumber',
+
+        },
+        {
+            title: 'ICCID',
+            dataIndex: 'iccid',
+            key: 'iccid',
+        },
+        {
+            title: 'Mobile Number',
+            dataIndex: 'mobileNumber',
+            key: 'mobileNumber',
+        },
         {
             title: 'Product Type',
             dataIndex: 'product_type',
             key: 'product_type',
             render: (_, record) => (
-                record?.productType?.product_type
+                record?.productTypeId?.name
             ),
         },
         {
-            title: 'Description',
-            dataIndex: 'description',
-            key: 'description',
-        },
-        {
-            title: 'Product Plan',
+            title: 'Product Price',
             dataIndex: 'productPlan',
             key: 'productPlan',
+        },
+        {
+            title: 'Verification Status',
+            dataIndex: 'isActive',
+            key: 'isActive',
+        },
+        {
+            title: 'Message',
+            dataIndex: 'comment',
+            key: 'comment',
+        },
+        {
+            title: 'Expiry Date',
+            dataIndex: 'expiryDate',
+            key: 'expiryDate',
+            render: (text) => (text ? moment(text).format('YYYY-MM-DD') : ''),
+        },
+        {
+            title: 'Activated Date',
+            dataIndex: '',
+            key: '',
+
+        },
+        {
+            title: 'Inward Time',
+            dataIndex: 'activatedDate',
+            key: 'activatedDate',
+            render: (text) => (text ? moment(text).format('YYYY-MM-DD') : ''),
         },
         {
             title: 'Action',
@@ -67,14 +109,15 @@ const AllInventory = () => {
 
     const handleFinish = (values) => {
         const productType = getProductType?.payload?.data?.find(item => item._id === values.productType);
+        const productPlan = getProductPlan?.payload?.data?.find(item => item._id === values.productPlan);
         if (isEditing) {
-            dispatch(updateProductPlan(currentProductType, { ...values, product_type: productType })).then((res) => {
-                if (res.type === "UPDATE_PRODUCT_PLAN_SUCCESS") {
+            dispatch(updateInventory(currentProductType, { ...values, product_type: productType, product_plan: productPlan })).then((res) => {
+                if (res.type === "UPDATE_INVENTORY_SUCCESS") {
                     notification.success({
                         message: "Update Successful",
                         className: "toast-success",
                     });
-                    dispatch(productPlanSearch());
+                    dispatch(InventorySearch());
                     form.resetFields();
                     setShowForm(false);
                     setIsEditing(false);
@@ -87,13 +130,13 @@ const AllInventory = () => {
                 }
             });
         } else {
-            dispatch(addProductPlan({ ...values, product_type: productType })).then((res) => {
-                if (res.type === "POST_PRODUCT_PLAN_SUCCESS") {
+            dispatch(addInventory({ ...values, product_type: productType, product_plan: productPlan })).then((res) => {
+                if (res.type === "POST_INVENTORY_SUCCESS") {
                     notification.success({
                         message: "Insert Successful",
                         className: "toast-success",
                     });
-                    dispatch(productPlanSearch());
+                    dispatch(InventorySearch());
                     form.resetFields();
                     setShowForm(false);
                 } else {
@@ -107,29 +150,46 @@ const AllInventory = () => {
     };
 
     const handleEdit = (record) => {
-        console.log(record);
         setIsEditing(true);
         setCurrentProductType(record._id);
         setShowForm(true);
         form.setFieldsValue({
-            productType: record.productTypeId,
-            productPlan: record.productPlan,
-            description: record.description,
+            order: record.orderNumber,
+            productType: record.productTypeId?.id,
+            productPlan: record.productPlanId?.id,
+            comment: record.comment,
+            expiry: record.expiryDate ? moment(record.expiryDate) : null,
+            activated: record.activatedDate ? moment(record.activatedDate) : null,
+            iccid: record.iccid,
+            mobile: record.mobileNumber,
+            quantity: record.quantity,
+            pin: record.puk
         });
     };
 
     const handleDelete = (key) => {
-        dispatch(deleteProductPlan(key)).then((res) => {
-            if (res.type === "DELETE_PRODUCT_PLAN_SUCCESS") {
-                notification.success({
-                    message: "Delete Successful",
-                    className: "toast-success",
-                });
-                dispatch(productPlanSearch());
-            } else {
-                notification.error({
-                    message: res?.payload?.message,
-                    className: "toast-error",
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to delete this item?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, delete it!',
+            cancelButtonText: 'No, keep it'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                dispatch(deleteInventory(key)).then((res) => {
+                    if (res.type === "DELETE_INVENTORY_SUCCESS") {
+                        notification.success({
+                            message: "Delete Successful",
+                            className: "toast-success",
+                        });
+                        dispatch(InventorySearch());
+                    } else {
+                        notification.error({
+                            message: res?.payload?.message,
+                            className: "toast-error",
+                        });
+                    }
                 });
             }
         });
@@ -140,21 +200,21 @@ const AllInventory = () => {
             <Content style={{ backgroundColor: 'white', padding: '20px', borderRadius: '8px' }}>
                 {!showForm && (
                     <>
-                        <Title level={2}>All Product Plans</Title>
+                        <Title level={2}>All Inventory</Title>
                         <hr />
                         <Table
                             columns={columns}
-                            loading={getProductPlan?.loading}
-                            dataSource={getProductPlan?.payload?.data}
+                            loading={getInventory?.loading}
+                            dataSource={getInventory?.payload?.data}
                             pagination={false}
-                            footer={() => `Total records: ${getProductPlan?.payload?.data?.length ? getProductPlan?.payload?.data?.length : 0}`}
+                            footer={() => `Total records: ${getInventory?.payload?.data?.length ? getInventory?.payload?.data?.length : 0}`}
                             style={{ marginBottom: '20px', paddingBottom: '20px', border: '1px solid #f0f0f0' }}
                         />
                     </>
                 )}
                 {showForm && (
                     <div style={{ maxWidth: '600px', margin: '20px 0', backgroundColor: 'white', padding: '20px', borderRadius: '8px', border: '1px solid #f0f0f0' }}>
-                        <Title level={3}>{isEditing ? 'Edit' : 'Add'} Product Plan</Title>
+                        <Title level={3}>{isEditing ? 'Edit' : 'Add'} Inventory</Title>
                         <hr />
                         <Form
                             form={form}
@@ -163,29 +223,80 @@ const AllInventory = () => {
                             onFinish={handleFinish}
                         >
                             <Form.Item
+                                label="Order Number/ Buyer Name"
+                                name="order"
+                            >
+                                <Input placeholder="" />
+                            </Form.Item>
+
+                            <Form.Item
                                 label="Select Product Type"
                                 name="productType"
                                 rules={[{ required: true, message: 'Please select the product type!' }]}
                             >
-                                <Select placeholder="Select product type">
+                                <Select placeholder="--Select--">
                                     {getProductType?.payload?.data?.map((type) => (
                                         <Option key={type._id} value={type._id}>{type.product_type}</Option>
                                     ))}
                                 </Select>
                             </Form.Item>
                             <Form.Item
-                                label="Product Plan"
+                                label="Select Product Plan"
                                 name="productPlan"
-                                rules={[{ required: true, message: 'Please input the product plan!' }]}
                             >
-                                <Input placeholder="Enter product plan" />
+                                <Select placeholder="--Select--">
+                                    {getProductPlan?.payload?.data?.map((type) => (
+                                        <Option key={type._id} value={type._id}>{type.productPlan}</Option>
+                                    ))}
+                                </Select>
+                            </Form.Item>
+                            <Form.Item
+                                label="ICCID"
+                                name="iccid"
+                            >
+                                <Input placeholder="Enter ICCID" />
                             </Form.Item>
 
                             <Form.Item
-                                label="Description"
-                                name="description"
+                                label="Mobile Number"
+                                name="mobile"
+
                             >
-                                <TextArea placeholder="Enter description..." />
+                                <Input type="number" placeholder="Enter Number" />
+                            </Form.Item>
+                            <Form.Item
+                                label="PUK/PIN"
+                                name="pin"
+                            >
+                                <Input placeholder="Enter Pin" />
+                            </Form.Item>
+
+                            <Form.Item
+                                label="Expiry Date"
+                                name="expiry"
+                            >
+                                <DatePicker />
+                            </Form.Item>
+
+                            <Form.Item
+                                label="Quantity"
+                                name="quantity"
+                            >
+                                <Input type='number' placeholder="###" />
+                            </Form.Item>
+
+                            <Form.Item
+                                label="Comments"
+                                name="comment"
+                            >
+                                <TextArea placeholder="Enter comments..." />
+                            </Form.Item>
+
+                            <Form.Item
+                                label="Activated Date"
+                                name="activated"
+                            >
+                                <DatePicker />
                             </Form.Item>
 
                             <Form.Item>

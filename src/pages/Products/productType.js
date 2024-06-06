@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Layout, Form, Input, Checkbox, Button, Table, Typography, Space, notification } from 'antd';
 import { addProductType, productTypeSearch, deleteProductType, updateProductType } from '../../redux/actions/productType.action';
 import { useDispatch, useSelector } from "react-redux";
+import Swal from 'sweetalert2';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 
 const { Content } = Layout;
@@ -111,21 +112,32 @@ const ProductType = () => {
   };
 
   const handleDelete = (key) => {
-    dispatch(deleteProductType(key)).then((res) => {
-      if (res.type === "DELETE_PRODUCT_TYPE_SUCCESS") {
-        notification.success({
-          message: "Delete Successful",
-          className: "toast-success",
-        });
-        dispatch(productTypeSearch());
-      } else {
-        notification.error({
-          message: res?.payload?.message,
-          className: "toast-error",
-        });
-      }
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "Do you want to delete this item?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'No, keep it'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            dispatch(deleteProductType(key)).then((res) => {
+                if (res.type === "DELETE_PRODUCT_TYPE_SUCCESS") {
+                    notification.success({
+                        message: "Delete Successful",
+                        className: "toast-success",
+                    });
+                    dispatch(productTypeSearch());
+                } else {
+                    notification.error({
+                        message: res?.payload?.message,
+                        className: "toast-error",
+                    });
+                }
+            });
+        }
     });
-  };
+};
 
   return (
     <Layout style={{ padding: '20px', minHeight: '100vh', backgroundColor: 'white' }}>
