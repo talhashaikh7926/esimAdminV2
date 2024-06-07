@@ -46,7 +46,7 @@ export default function MainHeader({ title, mobileSidebar, toggle1 }) {
         </div>
 
         <Button
-          className="logout-btn align-items-center justify-content-center"
+          className="logout-btn align-items-center justify-content-center ad"
           type="button"
           size="medium"
           onClick={() => logout()}

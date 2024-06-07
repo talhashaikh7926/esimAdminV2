@@ -13,6 +13,12 @@ import {
 import { createBrowserHistory } from "history";
 import { Layout, Menu, Button } from "antd";
 import InventoryIccid from "../pages/inventoryTracking/inventorywithICCID";
+import InventoryWithoutIccid from "../pages/inventoryTracking/inventorywithoutICCID";
+import PivotChart from "../pages/inventoryTracking/pivotChart";
+import "../css/customstyle.scss"
+import NonIccidProduct from "../pages/nonIccidProducts/nonICCIDproducts";
+import ArrvialSubmission from "../pages/arrivalSubmission/arrival";
+
 
 const { SubMenu } = Menu;
 const { Header, Sider, Content, Footer } = Layout;
@@ -98,7 +104,9 @@ const App = () => {
 
   return (
     <Layout style={{ minHeight: '100vh', backgroundColor: '#fff', overflow: 'hidden' }}>
-      <Header className="site-layout-background" style={{ padding: '0 20px', backgroundColor: 'rgba(255, 255, 255, 0.8)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '83px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)' }}>
+      <Header className="site-layout-background custom-header" style={{ padding: '0 20px', backgroundColor: 'rgba(255, 255, 255, 0.8)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '83px',
+      //  boxShadow: '0 6px 4px rgba(0, 0, 0, 0.7)'
+        }}>
         <div>
           <h4>Echo Networks</h4>
         </div>
@@ -124,6 +132,7 @@ const App = () => {
       </Header>
       <Layout style={{ flexDirection: 'row', flexGrow: 1 }}>
         <Sider
+        className="sidebar-style"
           style={{ backgroundColor: '#fff', paddingTop: '20px', marginTop: '16px' }} // Add marginTop to separate from the header
           width={250} // Increase the width of the sidebar
         >
@@ -156,6 +165,16 @@ const App = () => {
                   My Inventory With ICCID
                 </Link>
               </Menu.Item>
+              <Menu.Item key="inventory-without-iccid" style={{ transition: 'background-color 0.3s' }}>
+                <Link to="inventory-without-iccid" onClick={() => { changetitle("Inventory without Iccid"); setToggle(false); }}>
+                  My Inventory Without ICCID
+                </Link>
+              </Menu.Item>
+              <Menu.Item key="chart" style={{ transition: 'background-color 0.3s' }}>
+                <Link to="chart" onClick={() => { changetitle("Pivot Chart"); setToggle(false); }}>
+                  Pivot Chart
+                </Link>
+              </Menu.Item>
             </SubMenu>
 
             <Menu.Item key="productType" icon={<FontAwesomeIcon icon={faGauge} />} style={{ transition: 'background-color 0.3s' }}>
@@ -169,6 +188,16 @@ const App = () => {
                 Product Plan Upload
               </Link>
             </Menu.Item>
+            <Menu.Item key="non-iccid" icon={<FontAwesomeIcon icon={faGauge} />} style={{ transition: 'background-color 0.3s' }}>
+              <Link to="non-iccid" onClick={() => { changetitle("Non ICCID product"); setToggle(false); }}>
+                Non ICCID Products Update
+              </Link>
+            </Menu.Item>
+            <Menu.Item key="arrival-submission" icon={<FontAwesomeIcon icon={faGauge} />} style={{ transition: 'background-color 0.3s' }}>
+              <Link to="arrival-submission" onClick={() => { changetitle("Arrival Date"); setToggle(false); }}>
+                Arrival Date Submission 
+              </Link>
+            </Menu.Item>
 
 
           </Menu>
@@ -180,6 +209,12 @@ const App = () => {
               <Route path="/productPlan" exact element={<ProductPlan />} />
               <Route path="/inventory" exact element={<AllInventory />} />
               <Route path="/inventory-iccid" exact element={<InventoryIccid />} />
+              <Route path="/inventory-without-iccid" exact element={<InventoryWithoutIccid/>} />
+              <Route path="/chart" exact element={<PivotChart/>} />
+              <Route path="/non-iccid" exact element={<NonIccidProduct/>} />
+              <Route path="/arrival-submission" exact element={<ArrvialSubmission/>} />
+              
+              
             </Routes>
           </Content>
 

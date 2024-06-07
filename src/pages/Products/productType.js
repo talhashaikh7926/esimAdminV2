@@ -63,7 +63,7 @@ const ProductType = () => {
 
   const handleFinish = (values) => {
     if (isEditing) {
-      dispatch(updateProductType(currentProductType, values )).then((res) => {
+      dispatch(updateProductType(currentProductType, values)).then((res) => {
         if (res.type === "UPDATE_PRODUCT_TYPE_SUCCESS") {
           notification.success({
             message: "Update Successful",
@@ -113,31 +113,31 @@ const ProductType = () => {
 
   const handleDelete = (key) => {
     Swal.fire({
-        title: 'Are you sure?',
-        text: "Do you want to delete this item?",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'No, keep it'
+      title: 'Are you sure?',
+      text: "Do you want to delete this item?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'No, keep it'
     }).then((result) => {
-        if (result.isConfirmed) {
-            dispatch(deleteProductType(key)).then((res) => {
-                if (res.type === "DELETE_PRODUCT_TYPE_SUCCESS") {
-                    notification.success({
-                        message: "Delete Successful",
-                        className: "toast-success",
-                    });
-                    dispatch(productTypeSearch());
-                } else {
-                    notification.error({
-                        message: res?.payload?.message,
-                        className: "toast-error",
-                    });
-                }
+      if (result.isConfirmed) {
+        dispatch(deleteProductType(key)).then((res) => {
+          if (res.type === "DELETE_PRODUCT_TYPE_SUCCESS") {
+            notification.success({
+              message: "Delete Successful",
+              className: "toast-success",
             });
-        }
+            dispatch(productTypeSearch());
+          } else {
+            notification.error({
+              message: res?.payload?.message,
+              className: "toast-error",
+            });
+          }
+        });
+      }
     });
-};
+  };
 
   return (
     <Layout style={{ padding: '20px', minHeight: '100vh', backgroundColor: 'white' }}>
@@ -171,16 +171,17 @@ const ProductType = () => {
                 name="productType"
                 rules={[{ required: true, message: 'Please input the product type!' }]}
               >
-                <Input placeholder="Enter product type" />
+                <Input size='large' placeholder="Enter product type" />
               </Form.Item>
               <Form.Item name="iccid" valuePropName="checked">
                 <Checkbox>ICCID</Checkbox>
               </Form.Item>
               <Form.Item>
-                <Button type="primary" htmlType="submit" style={{ marginRight: '10px' }}>
+                <Button size='large' htmlType="submit" style={{ marginRight: '10px' }}>
                   Submit
                 </Button>
                 <Button
+                  size='large'
                   htmlType="button"
                   onClick={() => {
                     form.resetFields();

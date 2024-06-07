@@ -300,10 +300,11 @@ const AllInventory = () => {
                             </Form.Item>
 
                             <Form.Item>
-                                <Button type="primary" htmlType="submit" style={{ marginRight: '10px' }}>
+                            <Button size='large' htmlType="submit" style={{ marginRight: '10px' }}>
                                     Submit
                                 </Button>
                                 <Button
+                                size='large'
                                     htmlType="button"
                                     onClick={() => {
                                         form.resetFields();
